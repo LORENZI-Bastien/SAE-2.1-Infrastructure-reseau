@@ -1,0 +1,31 @@
+FICHIER /ETC/SSH/SSHD_CONFIG
+
+PermitRootLogin no
+Banner /etc/issue.net
+ListenAddress 172.16.3.1
+KexAlgorithms +diffie-hellman-group1-sha1
+Ciphers +aes128-cbc,aes128-ctr
+PasswordAuthentication yes
+
+
+SSH CONNEXION AU SERVEUR DEPUIS LE PC 
+
+The programs included with the Debian GNU/Linux system are free sol the exact distribution terms for each program are described in the individual files in /us/share/doc/*/copyright.
+
+Debian GNU/Linux comes with ABSOLUTELY NO WARRANTY, to the extent permitted by applicable law. tp@servpxe-3:~$ ssh 172.16.2.14
+
+tp@servpxe-3:~$ ssh admin@172.16.3.14
+
+ssh: connect to host 172.16.3.14 port 22: Connection refused tp@servpxe-3
+
+tp@servpxe-3:~$ ssh admin@172.16.3.^C
+
+tp@servpxe-3 nmap
+
+-bash: nmap: command not found tp@servpxe-3 apt get nmap
+
+E: Invalid operation get tp@servpxe-3 apt get install nmap
+
+E:
+
+Invalid operation get tp@servpxe-3:~$ logout

@@ -1,0 +1,10 @@
+FICHIER /ETC/EXPORTS
+
+#/srv/tftp/          *(rw,sync,no_subtree_check,no_root_squash)
+#/srv/nfs/3ea66156   *(rw,sync,no_subtree_check,no_root_squash)
+/srv/nfs/3ea66156 *(rw,sync,no_subtree_check,no_root_squash)
+
+
+FICHIER /SRV/TFTP/3EA66156/CMDLINE.TXT
+
+console=serial0,115200 console=tty1 root=/dev/nfs nfsroot=172.16.3.1:/srv/nfs/3ea66156,nfsvers=3 rw ip=dhcp rootwait

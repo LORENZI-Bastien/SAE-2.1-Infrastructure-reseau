@@ -1,0 +1,195 @@
+Ping depuis routeur 
+
+router-3#ping 172.16.3.1
+Type escape sequence to abort.
+Sending 5, 100-byte ICMP Echos to 172.16.3.1, timeout is 2 seconds:
+!!!!!
+Success rate is 100 percent (5/5), round-trip min/avg/max = 1/1/1 ms
+router-3#ping 172.16.3.34
+Type escape sequence to abort.
+Sending 5, 100-byte ICMP Echos to 172.16.3.34, timeout is 2 seconds:
+!!!!!
+Success rate is 100 percent (5/5), round-trip min/avg/max = 1/1/4 ms
+router-3#
+
+ping depuis switch
+
+switch-3#ping 172.16.3.33
+Type escape sequence to abort.
+Sending 5, 100-byte ICMP Echos to 172.16.3.33, timeout is 2 seconds:
+!!!!!
+Success rate is 100 percent (5/5), round-trip min/avg/max = 1/2/8 ms
+switch-3#ping 172.16.3.1
+Type escape sequence to abort.
+Sending 5, 100-byte ICMP Echos to 172.16.3.1, timeout is 2 seconds:
+!!!!!
+Success rate is 100 percent (5/5), round-trip min/avg/max = 1/3/8 ms
+switch-3#
+
+et ping depuis servpxe-3 proxmox
+
+
+root@servpxe-3:~# ping
+172.16.3.14 PING 172.16.3.14
+(172.16.3.14) 56(84) bytes of
+data. 64 bytes from 172.16.3.14:
+icmp seq=l ttl=255 time=0.441
+ms 64 bytes from 172.16.3.14:
+icmp seq=2 ttl=255 time=0.483
+ms 64 bytes from 172.16.3.14:
+icmp seq=3 ttl=255 time=0.409
+ms 64 bytes from 172.16.3.14:
+icmp seq=4 ttl=255 time=0.447
+ms ^C
+172.16.3.14 ping statistics : 4
+packets transmitted, 4 received,
+0% packet loss, time 3076ms rtt
+min/avg/max/mdev =
+0.409/0.445/0.483/0.026 ms
+VNC 
+
+
+
+
+root@servpxe-3:~# ping
+172.16.3.33 PING 172.16.3.33
+(172.16.3.33) 56(84) bytes of
+data 64 bytes from 172.16.3.33:
+icmp_seq=l ttl=255 time=0.450
+ms 64 bytes from 172.16.3.33:
+icmp seq=2 ttl=255 time=0.500
+ms 64 bytes from 172.16.3.33:
+icmp seq=3 ttl=255 time=0.533
+ms AC -- 172.16.3.33 ping
+statistics 3 packets transmitted.
+3 received, 0s packet loss, time
+2041ms rtt min/avg/max/mdev =
+0.450/0.494/0.533/0.034 ms
+
+
+root@servpxe-3:~# ping
+172.16.3.34 PING 172.16.3.34
+(172.16.3.34) 56(84) bytes of
+data. 64 bytes from 172.16.3.34:
+icmp seq=l ttl=254 time=2.18 ms
+64 bytes from 172.16.3.34: icmp
+seq=2 ttl=254 time=1.83 ms 64
+bytes from 172.16.3.34: icmp
+seq=3 ttl=254 time=2.85 ms 64
+bytes from 172.16.3.34: icmp
+seq=4 ttl=254 time=2.13 ms 64
+bytes from 172.16.3.34: icmp
+seg=5 ttl=254 time=1.99 ms ^C
+-- 172.16.3.34 ping statistics 5
+packets transmitted, 5 received,
+0% packet loss, time 4007ms rtt
+min/avg/max/mdev =
+1.827/2.196/2.851/0.349 ms
+
+router-3#show run
+Building configuration...
+Current configuration : 1208 bytes
+!
+! Last configuration change at 08:46:05 UTC Wed May 14 2025
+!
+version 15.8
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+!
+hostname router-3
+!
+boot-start-marker
+boot-end-marker
+!
+!
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+ip cef
+no ipv6 cef
+multilink bundle-name authenticated
+!
+!
+!
+license udi pid CISCO1941/K9 sn FCZ1819C0RH
+!
+!
+!
+redundancy
+!
+!
+!
+!
+!
+!
+interface Embedded-Service-Engine0/0
+no ip address
+shutdown
+!
+interface GigabitEthernet0/0
+ip address 172.16.3.33 255.255.255.240
+ip helper-address 172.16.3.1
+
+duplex auto
+speed auto
+!
+interface GigabitEthernet0/1
+ip address 172.16.3.14 255.255.255.240
+duplex auto
+speed auto
+!
+interface FastEthernet0/0/0
+no ip address
+shutdown
+duplex auto
+speed auto
+!
+interface FastEthernet0/1/0
+no ip address
+shutdown
+duplex auto
+speed auto
+!
+ip forward-protocol nd
+!
+no ip http server
+no ip http secure-server
+!
+!
+!
+!
+!
+control-plane
+!
+!
+line con 0
+line aux 0
+line 2
+no activation-character
+no exec
+transport preferred none
+transport output pad telnet rlogin lapb-ta mop udptn v120 ssh
+stopbits 1
+line vty 0 4
+login
+transport input none
+!
+scheduler allocate 20000 1000
+!
+end
+
+
+
+

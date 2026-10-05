@@ -1,0 +1,71 @@
+FICHIER /ETC/NETWORK/INTERFACES
+
+# This file describes the network interfaces available on your system
+# and how to activate them. For more information, see interfaces(5).
+
+source /etc/network/interfaces.d/*
+
+# The loopback network interface
+auto lo
+iface lo inet loopback
+
+#Interfaces NAT
+auto ens18
+iface ens18 inet dhcp
+
+#Interface vers le routeur
+auto ens19
+iface ens19 inet static
+    address 172.16.3.1
+    netmask 255.255.255.240
+
+#Interface vers clipxe-3
+auto ens20
+iface ens20 inet static
+    address 172.16.3.17
+    netmask 255.255.255.240
+
+#Route vers Réseau 3
+up /bin/ip route add 172.16.3.32/28 via 172.16.3.14
+
+
+
+RÉSULTAT DE LA COMMANDE IP A 
+
+root@servpxe-3:~# ip a
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host 
+       valid_lft forever preferred_lft forever
+2: ens18: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP group default qlen 1000
+    link/ether bc:24:11:af:64:c1 brd ff:ff:ff:ff:ff:ff
+    altname enp0s18
+    inet6 fe80::be24:11ff:feaf:64c1/64 scope link 
+       valid_lft forever preferred_lft forever
+3: ens19: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP group default qlen 1000
+    link/ether bc:24:11:ec:12:5e brd ff:ff:ff:ff:ff:ff
+    altname enp0s19
+    inet 172.16.3.1/28 brd 172.16.3.15 scope global ens19
+       valid_lft forever preferred_lft forever
+    inet6 fe80::be24:11ff:feec:125e/64 scope link 
+       valid_lft forever preferred_lft forever
+4: ens20: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP group default qlen 1000
+    link/ether bc:24:11:ad:f6:0d brd ff:ff:ff:ff:ff:ff
+    altname enp0s20
+    inet 172.16.3.17/28 brd 172.16.3.31 scope global ens20
+       valid_lft forever preferred_lft forever
+    inet6 fe80::be24:11ff:feal:adf6/64 scope link 
+       valid_lft forever preferred_lft forever
+root@servpxe-3:~#
+
+
+RÉSULTAT DE LA COMMANDE IP ROUTE SHOW
+
+root@servpxe-3:~# ip route show
+172.16.3.0/28 dev ens19 proto kernel scope link src 172.16.3.1
+172.16.3.16/28 dev ens20 proto kernel scope link src 172.16.3.17
+172.16.3.32/28 via 172.16.3.14 dev ens19
+root@servpxe-3:~#
+

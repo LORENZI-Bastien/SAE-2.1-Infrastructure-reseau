@@ -1,0 +1,168 @@
+FICHIER /ETC/DHCP/DHCPD.CONF
+
+option domain-name "example.org";
+option domain-name-servers ns1.example.org, ns2.example.org;
+
+ddns-update-style none;
+
+default-lease-time 1800;
+max-lease-time 1800;
+authoritative;
+
+allow bootp;
+allow booting;
+deny unknown-clients;
+
+# === Réseau 1 ===
+subnet 172.16.3.0 netmask 255.255.255.240 {
+    range 172.16.3.2 172.16.3.10;
+    option routers 172.16.3.14;
+    option broadcast-address 172.16.3.15;
+}
+
+# === Réseau 2 ===
+subnet 172.16.3.16 netmask 255.255.255.240 {
+    range 172.16.3.18 172.16.3.25;
+    option routers 172.16.3.14;
+    option broadcast-address 172.16.3.31;
+
+    host clipxe-3 {
+        hardware ethernet BC:24:11:4C:F0:E1;
+        fixed-address 172.16.3.26;
+        filename "pxelinux.0";
+        next-server 172.16.3.17;
+    }
+}
+
+# === Réseau 3 ===
+subnet 172.16.3.32 netmask 255.255.255.240 {
+    range 172.16.3.40 172.16.3.45;
+    option routers 172.16.3.33;
+    option broadcast-address 172.16.3.47;
+
+    host raspi-3 {
+        hardware ethernet DC:A6:32:5E:B8:C2;
+        fixed-address 172.16.3.42;
+        filename "pxelinux.0";
+        next-server 172.16.3.1;
+        option tftp-server-name "172.16.3.1";
+        option vendor-class-identifier "PXEClient";
+        option vendor-encapsulated-options "Raspberry Pi Boot";
+    }
+
+    host pcsalletp-3 {
+        hardware ethernet 34:17:EB:9D:18:95;
+        fixed-address 172.16.3.43;
+        filename "pxelinux.0";
+        next-server 172.16.3.1;
+    }
+}
+
+FICHIER /ETC/DEFAULT/ISC-DHCP-SERVER
+
+# Defaults for isc-dhcp-server (sourced by /etc/init.d/isc-dhcp-server)
+
+# Path to dhcpd's config file (default: /etc/dhcp/dhcpd.conf).
+#DHCPDv4_CONF=/etc/dhcp/dhcpd.conf
+#DHCPDv6_CONF=/etc/dhcp/dhcpd6.conf
+
+# Path to dhcpd's PID file (default: /var/run/dhcpd.pid).
+#DHCPDv4_PID=/var/run/dhcpd.pid
+#DHCPDv6_PID=/var/run/dhcpd6.pid
+
+# Additional options to start dhcpd with.
+#   Don't use options -cf or -pf here; use DHCPD_CONF/ DHCPD_PID instead
+#OPTIONS=""
+
+# On what interfaces should the DHCP server (dhcpd) serve DHCP requests?
+#   Separate multiple interfaces with spaces, e.g. "eth0 eth1".
+INTERFACESv4="ens19 ens20"
+#INTERFACESv6=""
+
+
+Pour client proxmox
+
+root@debian11:~# dhclient -v
+Internet Systems Consortium DHCP Client 4.4.1
+Copyright 2004-2018 Internet Systems Consortium.
+All rights reserved.
+For info, please visit https://www.isc.org/software/dhcp/
+
+Listening on LPF/ens20/bc:24:11:4c:f0:e1
+Sending on   LPF/ens20/bc:24:11:4c:f0:e1
+Listening on LPF/ens18/bc:24:11:61:9f:58
+Sending on   LPF/ens18/bc:24:11:61:9f:58
+Sending on   Socket/fallback
+DHCPREQUEST for 172.16.3.26 on ens20 to 255.255.255.255 port 67
+DHCPDISCOVER on ens18 to 255.255.255.255 port 67 interval 6
+DHCPACK of 172.16.3.26 from 172.16.3.17
+RTNETLINK answers: File exists
+bound to 172.16.3.26 -- renewal in 756 seconds.
+root@debian11:~#
+
+root@debian11:~# ip a
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host 
+       valid_lft forever preferred_lft forever
+2: ens18: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP group default qlen 1000
+    link/ether bc:24:11:61:9f:58 brd ff:ff:ff:ff:ff:ff
+    inet6 fe80::be24:11ff:fe61:9f58/64 scope link 
+       valid_lft forever preferred_lft forever
+3: ens20: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP group default qlen 1000
+    link/ether bc:24:11:4c:f0:e1 brd ff:ff:ff:ff:ff:ff
+    inet 172.16.3.26/28 brd 172.16.3.31 scope global dynamic ens20
+       valid_lft 1698sec preferred_lft 1698sec
+    inet6 fe80::be24:11ff:fe4c:f0e1/64 scope link 
+       valid_lft forever preferred_lft forever
+
+
+Pour pc tp
+
+root@pcsalletp-3:~# dhclient -v
+Internet Systems Consortium DHCP Client 4.4.1
+Copyright 2004-2018 Internet Systems Consortium.
+All rights reserved.
+For info, please visit https://www.isc.org/software/dhcp/
+
+Listening on LPF/docker0/02:42:2b:38:58:77
+Sending on   LPF/docker0/02:42:2b:38:58:77
+Listening on LPF/eth0/34:17:eb:9d:18:95
+Sending on   LPF/eth0/34:17:eb:9d:18:95
+Listening on LPF/eth1/8e:94:f6:02:07:81
+Sending on   LPF/eth1/8e:94:f6:02:07:81
+Sending on   Socket/fallback
+
+DHCPDISCOVER on docker0 to 255.255.255.255 port 67 interval 7
+DHCPREQUEST for 172.16.3.43 on eth0 to 255.255.255.255 port 67
+DHCPDISCOVER on eth1 to 255.255.255.255 port 67 interval 6
+DHCPACK of 172.16.3.43 from 172.16.3.33
+RTNETLINK answers: File exists
+bound to 172.16.3.43 -- renewal in 802 seconds.
+root@pcsalletp-3:~#
+
+
+
+root@pcsalletp-3:~# ip a
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host 
+       valid_lft forever preferred_lft forever
+2: eth1: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc pfifo_fast state DOWN group default qlen 1000
+    link/ether 8e:94:f6:02:07:81 brd ff:ff:ff:ff:ff:ff
+    inet6 fe80::ea94:f6ff:fe02:781/64 scope link 
+       valid_lft forever preferred_lft forever
+3: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP group default qlen 1000
+    link/ether 34:17:eb:9d:18:95 brd ff:ff:ff:ff:ff:ff
+    inet 172.16.3.43/28 brd 172.16.3.47 scope global dynamic eth0
+       valid_lft 1706sec preferred_lft 1706sec
+    inet6 fe80::3617:ebff:fe9d:1895/64 scope link 
+       valid_lft forever preferred_lft forever
+5: docker0: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc noqueue state DOWN group default 
+    link/ether 02:42:2b:b3:58:77 brd ff:ff:ff:ff:ff:ff
+    inet 10.178.0.1/24 brd 10.178.0.255 scope global docker0
+       valid_lft forever preferred_lft forever

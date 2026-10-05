@@ -1,0 +1,100 @@
+FICHIER DE CONFIGURATION TFTP : /ETC/DEFAULT/TFTPD-HPA
+
+TFTP_USERNAME="tftp"
+TFTP_DIRECTORY="/srv/tftp"
+TFTP_ADDRESS="0.0.0.0:69"
+TFTP_OPTIONS="--secure"
+
+FICHIER DE CONFIGURATION DU ROUTEUR
+
+! Last configuration change at 07:48:53 UTC Thu May 15 2025
+!
+version 15.8
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+!
+hostname router-3
+!
+boot-start-marker
+boot-end-marker
+!
+!
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+ip cef
+no ipv6 cef
+multilink bundle-name authenticated
+!
+license udi pid CISCO1941/K9 sn FCZ1819C0RH
+!
+redundancy
+!
+!
+!
+interface Embedded-Service-Engine0/0
+ no ip address
+ shutdown
+!
+interface GigabitEthernet0/0
+ ip address 172.16.3.33 255.255.255.240
+ ip helper-address 172.16.3.1
+ duplex auto
+ speed auto
+!
+interface GigabitEthernet0/1
+ ip address 172.16.3.14 255.255.255.240
+ duplex auto
+ speed auto
+!
+interface FastEthernet0/0
+ no ip address
+ shutdown
+ duplex auto
+ speed auto
+!
+interface FastEthernet0/1
+ no ip address
+ shutdown
+ duplex auto
+ speed auto
+!
+ip forward-protocol nd
+no ip http server
+no ip http secure-server
+!
+!
+!
+!
+control-plane
+!
+line con 0
+line aux 0
+line 2
+ no activation-character
+ no exec
+ transport preferred none
+ transport output pad telnet rlogin lapb-ta mop udptn v120 ssh
+ stopbits 1
+line vty 0 4
+ login
+ transport input none
+!
+scheduler allocate 20000 1000
+!
+end
+
+PREUVE QUE LE PARTAGE FONCTIONNE
+
+router-3#copy running-config tftp
+Address or name of remote host []? 172.16.3.1
+Destination filename [router-3-config]? config
+!!
+1208 bytes copied in 0.136 secs (8882 bytes/sec)
